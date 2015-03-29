@@ -1,4 +1,3 @@
-JSONdoc <- toJSON(StoreJSON, digits = 10)
 writeUtf8 <- function(x, file, bom=F) {
   con <- file(file, "wb")
   if(bom) writeBin(BOM, con, endian="little")
