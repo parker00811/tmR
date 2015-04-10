@@ -34,8 +34,23 @@ Geocoding <- function (address, output = "json", lang = "zh-TW") {
   
   geoCode <- getURL(url)
   geoCode <- fromJSON(geoCode)
+  
+  # if no result, just return string NULL
+  if(geoCode$status=="ZERO_RESULTS"){
+    geoCode <- data.frame(lat = "NULL",
+                          lng = "NULL",
+                          searchAddress = address,
+                          stringsAsFactors = FALSE)
+    return(geoCode)
+  }else if(geoCode$status!="OK"){
+    print(geoCode)
+    stop("Some problem happening now, please tell me.")
+  }
+  
   geoCode <- data.frame(lat = geoCode$results[[1]]$geometry$location[["lat"]],
                         lng = geoCode$results[[1]]$geometry$location[["lng"]],
-                        searchAddress = geoCode$results[[1]]$formatted_address)
+                        searchAddress = geoCode$results[[1]]$formatted_address,
+                        stringsAsFactors = FALSE)
+  Sys.sleep(0.05)
   return(geoCode)
 }
