@@ -6,18 +6,32 @@ writeUtf8 <- function(x, file, bom=F) {
 }
 
 
-Geocoding <- function (address = "台灣竹南鎮科北五路二號") {
+Geocoding <- function (address, output = "json", lang = "zh-TW") {
+  # Format can be json or xml
   require(RCurl)
   require(RJSONIO)
   
-  # if the address is big5, translate it to utf8
+  # Args:
+  #   address: The street address that you want to geocode, in the format used by the 
+  #            national postal service of the country concerned. 
+  #   output: where output may be either of the following values.
+  #     "json" (recommended) indicates output in JavaScript Object Notation (JSON).
+  #     "xml" indicates output as XML.
+  #   lang: The language in which to return results. 
+  #     see https://developers.google.com/maps/faq#languagesupport
+  
+  #   Returns:
+  #     The latitude, longitude and searching address by data frame.
+  
   tmp <- iconv(address, "big5", "utf8")
   if(!is.na(tmp)){
     address <- tmp
   }
   
   address <- URLencode(address)
-  url <- sprintf("http://maps.googleapis.com/maps/api/geocode/json?language=zh-TW&address=%s", address)
+  url <- sprintf("http://maps.googleapis.com/maps/api/geocode/%s?language=%s&address=%s", 
+                 output, lang, address)
+  
   geoCode <- getURL(url)
   geoCode <- fromJSON(geoCode)
   geoCode <- data.frame(lat = geoCode$results[[1]]$geometry$location[["lat"]],
